@@ -7,8 +7,8 @@ const CategoriaRoute = require('./src/routes/categoria.route.js');
 const ProductoRoute = require('./src/routes/producto.route.js');
 const MarcaRoute = require('./src/routes/marca.route.js');
 const ColorRoute = require('./src/routes/color.route.js');
-const ProductoTallaRoute = require('./src/routes/productoTalla.route.js');
-const ProductoColorRoute = require('./src/routes/productoColor.route.js');
+const ProductoTallaRoute = require('./src/routes/producto.talla.route.js');
+const ProductoColorRoute = require('./src/routes/producto.color.route.js');
 const TallaRoute = require('./src/routes/talla.route.js');
 
 class Server {

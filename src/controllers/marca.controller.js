@@ -1,5 +1,5 @@
 const db=require("../models")
-const marca=db.models("Marca")
+const marca=db.getModel("Marca")
 class MarcaController {
     async createMarca(req,res){
         //agregale validaciones al crear una marca, antes de crearla, agregale si ya existe que no cree
@@ -19,4 +19,4 @@ class MarcaController {
         //Esta se va a usar para el panel administrativo
     }
 }
-module.exports=new MarcaController();
+module.exports=MarcaController;

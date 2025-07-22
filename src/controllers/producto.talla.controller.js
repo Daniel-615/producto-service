@@ -1,5 +1,5 @@
 const db=require("../models")
-const productoTalla=db.models("ProductoTalla")
+const productoTalla=db.getModel("ProductoTalla")
 class ProductoTallaController {
     async createProductoTalla(req,res){
         //agregale validaciones al crear una categoria, antes de crearla, agregale si ya existe que no cree
@@ -19,4 +19,4 @@ class ProductoTallaController {
         //Esta se va a usar para el panel administrativo
     }
 }
-module.exports=new ProductoTallaController();
+module.exports=ProductoTallaController;

@@ -1,5 +1,5 @@
 const db=require("../models")
-const color=db.models("Color")
+const color=db.getModel("Color")
 class ColorController {
     async createColor(req,res){
         //agregale validaciones al crear un color, antes de crearla, agregale si ya existe que no cree
@@ -19,4 +19,4 @@ class ColorController {
         //Esta se va a usar para el panel administrativo
     }
 }
-module.exports=new ColorController();
+module.exports=ColorController;

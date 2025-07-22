@@ -1,5 +1,5 @@
 const db=require("../models")
-const productoColor=db.models("ProductoColor")
+const productoColor=db.getModel("ProductoColor")
 class ProductoColorController {
     async createProductoColor(req,res){
         //agregale validaciones al crear un productoColor, antes de crearla, agregale si ya existe que no cree
@@ -20,4 +20,4 @@ class ProductoColorController {
         //Esta se va a usar para el panel administrativo
     }
 }
-module.exports=new ProductoColorController();
+module.exports=ProductoColorController;

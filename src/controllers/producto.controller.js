@@ -1,5 +1,5 @@
 const db=require("../models")
-const producto=db.models("Producto")
+const producto=db.getModel("Producto")
 class ProductoController {
     async createProducto(req,res){
         //agregale validaciones al crear una producto, antes de crearla, agregale si ya existe que no cree
@@ -19,4 +19,4 @@ class ProductoController {
         //Esta se va a usar para el panel administrativo
     }
 }
-module.exports=new ProductoController();
+module.exports=ProductoController;

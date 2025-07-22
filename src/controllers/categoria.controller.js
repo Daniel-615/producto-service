@@ -1,5 +1,5 @@
 const db=require("../models")
-const categoria=db.models("Categoria")
+const categoria=db.getModel("Categoria")
 class CategoriaController {
     async createCategoria(req,res){
         //agregale validaciones al crear una categoria, antes de crearla, agregale si ya existe que no cree
@@ -19,4 +19,4 @@ class CategoriaController {
         //Esta se va a usar para el panel administrativo
     }
 }
-module.exports=new CategoriaController();
+module.exports=CategoriaController;

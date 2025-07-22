@@ -1,5 +1,5 @@
 const db=require("../models")
-const talla=db.models("Talla")
+const talla=db.getModel("Talla")
 class TallaController {
     async createTalla(req,res){
         //Las validaciones podes agregarlas a la carpeta middleware como funciones y luego solo importarlas
@@ -20,4 +20,4 @@ class TallaController {
         //Esta se va a usar para el panel administrativo
     }
 }
-module.exports=new TallaController();
+module.exports=TallaController;
