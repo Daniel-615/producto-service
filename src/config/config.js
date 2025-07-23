@@ -1,7 +1,7 @@
 const dotenv = require('dotenv');
 dotenv.config();
 const { 
-  APP_PORT,HOST,USER,PASSWORD,DB,PORT,SECRET_JWT_KEY,
+  APP_PORT,HOST,USER,PASSWORD,DB,PORT,
   FRONTEND_URL,BACKEND_URL
 }= process.env;
 
@@ -12,7 +12,6 @@ module.exports = {
   PASSWORD,
   DB,
   PORT,
-  SECRET_JWT_KEY,
   FRONTEND_URL,
   BACKEND_URL
 };
