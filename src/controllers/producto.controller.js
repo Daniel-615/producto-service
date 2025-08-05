@@ -2,8 +2,6 @@ const db=require("../models")
 const Producto =db.getModel("Producto")
 class ProductoController {
     async createProducto(req,res) {
-        //agregale validaciones al crear una producto, antes de crearla, agregale si ya existe que no cree
-        // que no se repita el nombre de la producto, etc.
         const { nombre, descripcion, precio, stock } = req.body;
 
         if (!nombre || !descripcion || precio === undefined || stock === undefined) {
@@ -16,13 +14,18 @@ class ProductoController {
                 return res.status(400).send({ message: "El producto ya existe." });
             }
 
-            const nuevoProducto = await Producto.create({ nombre, descripcion, precio, stock });
+            const nuevoProducto = await Producto.create({
+                    nombre, 
+                    descripcion, 
+                    precio, 
+                    stock 
+                });
             res.status(201).send({
                 message: "Producto creado exitosamente.",
                 producto: nuevoProducto
             });
         } catch (err) {
-          res.status(500).send({ message: err.message || "Error al crear el producto."});
+            res.status(500).send({ message: err.message || "Error al crear el producto."});
         }
     }
 
