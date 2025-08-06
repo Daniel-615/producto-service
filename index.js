@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 const { APP_PORT,FRONTEND_URL } = require('./src/config/config.js')
 const db = require('./src/models'); 
 const CategoriaRoute = require('./src/routes/categoria.route.js');
@@ -26,6 +27,7 @@ class Server {
       origin: FRONTEND_URL,
       credentials: true // Permitir cookies y credenciales
     }));
+    this.app.use("/uploads", express.static(path.join(__dirname, "uploads")));
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
   }

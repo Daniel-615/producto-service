@@ -1,22 +1,102 @@
-const db=require("../models")
-const marca=db.getModel("Marca")
+const db = require("../models");
+const Marca = db.getModel("Marca");
+
 class MarcaController {
-    async createMarca(req,res){
-        //agregale validaciones al crear una marca, antes de crearla, agregale si ya existe que no cree
-        // que no se repita el nombre de la marca, etc.
+  async createMarca(req, res) {
+    const { nombre } = req.body;
+
+    if (!nombre) {
+      return res.status(400).send({ message: "El nombre de la marca es obligatorio." });
     }
-    async getMarcas(req,res){
-        //acá solo empleados y administradores 
+
+    try {
+      const existente = await Marca.findOne({ where: { nombre } });
+      if (existente) {
+        return res.status(400).send({ message: "La marca ya existe." });
+      }
+
+      const nuevaMarca = await Marca.create({ nombre });
+      res.status(201).send({
+        message: "Marca creada exitosamente.",
+        marca: nuevaMarca,
+      });
+    } catch (err) {
+      res.status(500).send({ message: err.message || "Error al crear la marca." });
     }
-    async getMarcaById(req,res){
-        //aqui podrán obtenerlo los clientes, administradores y empleados
+  }
+
+  async getMarcas(req, res) {
+
+
+    try {
+      const marcas = await Marca.findAll();
+      res.send(marcas);
+    } catch (err) {
+      res.status(500).send({ message: "Error al obtener las marcas." });
     }
-    async updateMarca(req,res){
-        //aqui iría para actualizarlo podrán hacerlo los empleados y administradores
-        //agregale validacion que busque la marca por id si no la encuentra que no te deje actualizar
+  }
+
+  async getMarcaById(req, res) {
+    const { id } = req.params;
+
+    try {
+      const marca = await Marca.findByPk(id);
+      if (!marca) {
+        return res.status(404).send({ message: "Marca no encontrada." });
+      }
+
+      res.send(marca);
+    } catch (err) {
+      res.status(500).send({ message: "Error al obtener la marca." });
     }
-    async deleteMarca(req,res){
-        //Esta se va a usar para el panel administrativo
+  }
+
+  async updateMarca(req, res) {
+    const { id } = req.params;
+    const { nombre } = req.body;
+
+    try {
+      const marca = await Marca.findByPk(id);
+      if (!marca) {
+        return res.status(404).send({ message: "Marca no encontrada." });
+      }
+
+      if (nombre) {
+        const existeNombre = await Marca.findOne({ where: { nombre } });
+        if (existeNombre && existeNombre.id !== parseInt(id)) {
+          return res.status(400).send({ message: "Ya existe otra marca con ese nombre." });
+        }
+        marca.nombre = nombre;
+      }
+
+      await marca.save();
+
+      res.send({
+        message: "Marca actualizada correctamente.",
+        marca,
+      });
+    } catch (err) {
+      res.status(500).send({ message: "Error al actualizar la marca." });
     }
+  }
+
+  async deleteMarca(req, res) {
+
+    const { id } = req.params;
+
+    try {
+      const marca = await Marca.findByPk(id);
+      if (!marca) {
+        return res.status(404).send({ message: "Marca no encontrada." });
+      }
+
+      await marca.destroy();
+
+      res.send({ message: "Marca eliminada exitosamente." });
+    } catch (err) {
+      res.status(500).send({ message: "Error al eliminar la marca." });
+    }
+  }
 }
-module.exports=MarcaController;
+
+module.exports = MarcaController;

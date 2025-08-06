@@ -11,54 +11,17 @@ class ColorRoute {
 
   registerRoutes() {
     // Crear un nuevo color
-    this.router.post("/", (req, res) => {
-      try {
-        this.controller.createColor(req, res);
-      } catch (err) {
-        console.error("Error en la ruta POST /color:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.post("/", this.controller.createColor.bind(this.controller));
 
     // Obtener todos los colores
-    this.router.get("/", (req, res) => {
-      try {
-        this.controller.getColores(req, res);
-      } catch (err) {
-        console.error("Error en la ruta GET /color:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.get("/", this.controller.getColores.bind(this.controller));
 
     // Obtener un color por ID
-    this.router.get("/:id", (req, res) => {
-      try {
-        this.controller.getColoresById(req, res);
-      } catch (err) {
-        console.error("Error en la ruta GET /color/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.get("/:id", this.controller.getColoresById.bind(this.controller));
 
     // Actualizar un color
-    this.router.put("/:id", (req, res) => {
-      try {
-        this.controller.updateColores(req, res);
-      } catch (err) {
-        console.error("Error en la ruta PUT /color/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.put("/:id", this.controller.updateColores.bind(this.controller));
 
-    // Eliminar un color
-    this.router.delete("/:id", (req, res) => {
-      try {
-        this.controller.deleteCategoria(req, res);
-      } catch (err) {
-        console.error("Error en la ruta DELETE /color/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
   }
 }
 

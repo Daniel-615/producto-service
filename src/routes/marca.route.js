@@ -11,54 +11,19 @@ class MarcaRoute {
 
   registerRoutes() {
     // Crear una nueva marca
-    this.router.post("/", (req, res) => {
-      try {
-        this.controller.createMarca(req, res);
-      } catch (err) {
-        console.error("Error en la ruta POST /marca:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.post("/", this.controller.createMarca.bind(this.controller));
 
     // Obtener todas las marcas
-    this.router.get("/", (req, res) => {
-      try {
-        this.controller.getMarcas(req, res);
-      } catch (err) {
-        console.error("Error en la ruta GET /marca:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.get("/", this.controller.getMarcas.bind(this.controller));
 
     // Obtener marca por ID
-    this.router.get("/:id", (req, res) => {
-      try {
-        this.controller.getMarcaById(req, res);
-      } catch (err) {
-        console.error("Error en la ruta GET /marca/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.get("/:id", this.controller.getMarcaById.bind(this.controller));
 
     // Actualizar marca
-    this.router.put("/:id", (req, res) => {
-      try {
-        this.controller.updateMarca(req, res);
-      } catch (err) {
-        console.error("Error en la ruta PUT /marca/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.put("/:id", this.controller.updateMarca.bind(this.controller));
 
     // Eliminar marca
-    this.router.delete("/:id", (req, res) => {
-      try {
-        this.controller.deleteMarca(req, res);
-      } catch (err) {
-        console.error("Error en la ruta DELETE /marca/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.delete("/:id", this.controller.deleteMarca.bind(this.controller));
   }
 }
 

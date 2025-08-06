@@ -11,54 +11,19 @@ class CategoriaRoute {
 
   registerRoutes() {
     // Crear una nueva categoría
-    this.router.post("/", (req, res) => {
-      try {
-        this.controller.createCategoria(req, res);
-      } catch (err) {
-        console.error("Error en la ruta POST /categoria:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.post("/", this.controller.createCategoria.bind(this.controller));
 
     // Obtener todas las categorías
-    this.router.get("/", (req, res) => {
-      try {
-        this.controller.getCategorias(req, res);
-      } catch (err) {
-        console.error("Error en la ruta GET /categoria:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.get("/", this.controller.getCategorias.bind(this.controller));
 
     // Obtener una categoría por ID
-    this.router.get("/:id", (req, res) => {
-      try {
-        this.controller.getCategoriaById(req, res);
-      } catch (err) {
-        console.error("Error en la ruta GET /categoria/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.get("/:id", this.controller.getCategoriaById.bind(this.controller));
 
     // Actualizar una categoría
-    this.router.put("/:id", (req, res) => {
-      try {
-        this.controller.updateCategoria(req, res);
-      } catch (err) {
-        console.error("Error en la ruta PUT /categoria/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.put("/:id", this.controller.updateCategoria.bind(this.controller));
 
     // Eliminar una categoría
-    this.router.delete("/:id", (req, res) => {
-      try {
-        this.controller.deleteCategoria(req, res);
-      } catch (err) {
-        console.error("Error en la ruta DELETE /categoria/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.delete("/:id", this.controller.deleteCategoria.bind(this.controller));
   }
 }
 

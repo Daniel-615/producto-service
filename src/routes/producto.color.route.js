@@ -1,5 +1,6 @@
 const express = require('express');
 const ProductoColorController = require('../controllers/producto.color.controller.js');
+const upload = require('../middleware/uploadImage.js');
 
 class ProductoColorRoute {
   constructor(app) {
@@ -10,49 +11,33 @@ class ProductoColorRoute {
   }
 
   registerRoutes() {
-    this.router.post("/", (req, res) => {
-      try {
-        this.controller.createProductoColor(req, res);
-      } catch (err) {
-        console.error("Error en POST /producto-color:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
+    // Crear color con imagen
+    this.router.post("/", upload.single("imagen"), async (req, res) => {
+      const imagenUrl = req.file ? `/uploads/${req.file.filename}` : null;
+      req.body.imagenUrl = imagenUrl;
+      await this.controller.createProductoColor(req, res);
     });
 
+    // Obtener todos los colores
     this.router.get("/", (req, res) => {
-      try {
-        this.controller.getProductoColor(req, res);
-      } catch (err) {
-        console.error("Error en GET /producto-color:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
+      this.controller.getProductoColor(req, res);
     });
 
+    // Obtener color por ID
     this.router.get("/:id", (req, res) => {
-      try {
-        this.controller.getProductoColorById(req, res);
-      } catch (err) {
-        console.error("Error en GET /producto-color/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
+      this.controller.getProductoColorById(req, res);
     });
 
-    this.router.put("/:id", (req, res) => {
-      try {
-        this.controller.updateProductoColor(req, res);
-      } catch (err) {
-        console.error("Error en PUT /producto-color/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
+    // Actualizar color (puede incluir nueva imagen)
+    this.router.put("/:id", upload.single("imagen"), async (req, res) => {
+      const imagenUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+      req.body.imagenUrl = imagenUrl;
+      await this.controller.updateProductoColor(req, res);
     });
 
+    // Eliminar color
     this.router.delete("/:id", (req, res) => {
-      try {
-        this.controller.deleteProductoColor(req, res);
-      } catch (err) {
-        console.error("Error en DELETE /producto-color/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
+      this.controller.deleteProductoColor(req, res);
     });
   }
 }

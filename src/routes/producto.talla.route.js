@@ -10,50 +10,11 @@ class ProductoTallaRoute {
   }
 
   registerRoutes() {
-    this.router.post("/", (req, res) => {
-      try {
-        this.controller.createProductoTalla(req, res);
-      } catch (err) {
-        console.error("Error en POST /producto-talla:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
-
-    this.router.get("/", (req, res) => {
-      try {
-        this.controller.getProductoTalla(req, res);
-      } catch (err) {
-        console.error("Error en GET /producto-talla:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
-
-    this.router.get("/:id", (req, res) => {
-      try {
-        this.controller.getProductoTallaById(req, res);
-      } catch (err) {
-        console.error("Error en GET /producto-talla/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
-
-    this.router.put("/:id", (req, res) => {
-      try {
-        this.controller.updateProductoTalla(req, res);
-      } catch (err) {
-        console.error("Error en PUT /producto-talla/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
-
-    this.router.delete("/:id", (req, res) => {
-      try {
-        this.controller.deleteProductoTalla(req, res);
-      } catch (err) {
-        console.error("Error en DELETE /producto-talla/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.post("/", this.controller.createProductoTalla.bind(this.controller));
+    this.router.get("/", this.controller.getProductoTalla.bind(this.controller));
+    this.router.get("/:id", this.controller.getProductoTallaById.bind(this.controller));
+    this.router.put("/:id", this.controller.updateProductoTalla.bind(this.controller));
+    this.router.delete("/:id", this.controller.deleteProductoTalla.bind(this.controller));
   }
 }
 

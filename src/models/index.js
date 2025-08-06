@@ -50,11 +50,11 @@ class Database {
     } = this.models;
 
     // Relaciones Producto
-    Producto.belongsTo(Marca, { foreignKey: 'marcaId' });
-    Marca.hasMany(Producto, { foreignKey: 'marcaId' });
+    Producto.belongsTo(Marca, { foreignKey: 'marcaId', as: 'marca' });
+    Marca.hasMany(Producto, { foreignKey: 'marcaId', as: 'productos' });
 
-    Producto.belongsTo(Categoria, { foreignKey: 'categoriaId' });
-    Categoria.hasMany(Producto, { foreignKey: 'categoriaId' });
+    Producto.belongsTo(Categoria, { foreignKey: 'categoriaId', as: 'categoria' });
+    Categoria.hasMany(Producto, { foreignKey: 'categoriaId', as: 'productos' });
 
     Producto.belongsToMany(Talla, { through: ProductoTalla, foreignKey: 'productoId' });
     Talla.belongsToMany(Producto, { through: ProductoTalla, foreignKey: 'tallaId' });

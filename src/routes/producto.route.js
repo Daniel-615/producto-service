@@ -11,54 +11,19 @@ class ProductoRoute {
 
   registerRoutes() {
     // Crear un nuevo producto
-    this.router.post("/", (req, res) => {
-      try {
-        this.controller.createProducto(req, res);
-      } catch (err) {
-        console.error("Error en la ruta POST /producto:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.post("/", this.controller.createProducto.bind(this.controller));
 
     // Obtener todos los productos
-    this.router.get("/", (req, res) => {
-      try {
-        this.controller.getProductos(req, res);
-      } catch (err) {
-        console.error("Error en la ruta GET /producto:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.get("/", this.controller.getProductos.bind(this.controller));
 
     // Obtener un producto por ID
-    this.router.get("/:id", (req, res) => {
-      try {
-        this.controller.getProductoById(req, res);
-      } catch (err) {
-        console.error("Error en la ruta GET /producto/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.get("/:id", this.controller.getProductoById.bind(this.controller));
 
     // Actualizar un producto
-    this.router.put("/:id", (req, res) => {
-      try {
-        this.controller.updateProducto(req, res);
-      } catch (err) {
-        console.error("Error en la ruta PUT /producto/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.put("/:id", this.controller.updateProducto.bind(this.controller));
 
     // Eliminar un producto
-    this.router.delete("/:id", (req, res) => {
-      try {
-        this.controller.deleteProducto(req, res);
-      } catch (err) {
-        console.error("Error en la ruta DELETE /producto/:id:", err);
-        res.status(500).json({ error: "Error en el servidor" });
-      }
-    });
+    this.router.delete("/:id", this.controller.deleteProducto.bind(this.controller));
   }
 }
 
