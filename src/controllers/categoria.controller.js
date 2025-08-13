@@ -18,7 +18,7 @@ class CategoriaController {
       const nuevaCategoria = await Categoria.create({ nombre });
       res.status(201).send({
         message: "Categoría creada exitosamente.",
-        categoria: nuevaCategoria,
+        categoria: nuevaCategoria.nombre,
       });
     } catch (err) {
       res.status(500).send({ message: err.message || "Error al crear la categoría." });

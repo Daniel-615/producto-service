@@ -4,7 +4,7 @@ const ProductoColor = db.getModel("ProductoColor");
 class ProductoColorController {
   async createProductoColor(req, res) {
     const { color } = req.body;
-    const imagenUrl = req.body.imagenUrl; // ya viene inyectada desde la ruta
+    const imagenUrl = req.body.imagenUrl; 
 
     if (!color) {
       return res.status(400).send({ message: "El campo color es obligatorio." });
