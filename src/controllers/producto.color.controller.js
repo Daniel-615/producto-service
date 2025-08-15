@@ -3,28 +3,37 @@ const ProductoColor = db.getModel("ProductoColor");
 
 class ProductoColorController {
   async createProductoColor(req, res) {
-    const { color } = req.body;
-    const imagenUrl = req.body.imagenUrl; 
-
-    if (!color) {
-      return res.status(400).send({ message: "El campo color es obligatorio." });
-    }
-
-    try {
-      const existente = await ProductoColor.findOne({ where: { color } });
-      if (existente) {
-        return res.status(400).send({ message: "Ya existe un color con ese nombre." });
-      }
-
-      const nuevoColor = await ProductoColor.create({ color, imagenUrl });
-      res.status(201).send({
-        message: "Color creado exitosamente.",
-        color: nuevoColor
-      });
-    } catch (err) {
-      res.status(500).send({ message: err.message || "Error al crear el color." });
-    }
+  const { colorId, productoId } = req.body;
+  const imagenUrl = req.body.imagenUrl;
+  console.log(req.body.imagenUrl)
+  if (!colorId || !productoId) {
+    return res.status(400).send({ message: "colorId y productoId son obligatorios." });
   }
+
+  try {
+    const existente = await ProductoColor.findOne({
+      where: { colorId, productoId }
+    });
+
+    if (existente) {
+      return res.status(400).send({ message: "Ese producto ya tiene ese color." });
+    }
+
+    const nuevoColor = await ProductoColor.create({
+      colorId,
+      productoId,
+      imagenUrl
+    });
+
+    res.status(201).send({
+      message: "Color de producto creado exitosamente.",
+      data: nuevoColor
+    });
+  } catch (err) {
+    res.status(500).send({ message: err.message || "Error al crear el color de producto." });
+  }
+}
+
 
   async getProductoColor(req, res) {
     try {

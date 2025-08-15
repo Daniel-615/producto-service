@@ -2,6 +2,9 @@ const db = require("../models");
 const Producto = db.getModel("Producto");
 const Marca = db.getModel("Marca");
 const Categoria = db.getModel("Categoria");
+const ProductoColor = db.getModel("ProductoColor");
+const ProductoTalla = db.getModel("ProductoTalla");
+const Talla=db.getModel("Talla");
 
 class ProductoController {
   async createProducto(req, res) {
@@ -14,21 +17,15 @@ class ProductoController {
     try {
       // Validar existencia de la marca
       const marca = await Marca.findByPk(marcaId);
-      if (!marca) {
-        return res.status(400).send({ message: "La marca especificada no existe." });
-      }
+      if (!marca) return res.status(400).send({ message: "La marca especificada no existe." });
 
       // Validar existencia de la categoría
       const categoria = await Categoria.findByPk(categoriaId);
-      if (!categoria) {
-        return res.status(400).send({ message: "La categoría especificada no existe." });
-      }
+      if (!categoria) return res.status(400).send({ message: "La categoría especificada no existe." });
 
       // Validar producto único por nombre
       const existente = await Producto.findOne({ where: { nombre } });
-      if (existente) {
-        return res.status(400).send({ message: "El producto ya existe." });
-      }
+      if (existente) return res.status(400).send({ message: "El producto ya existe." });
 
       const nuevoProducto = await Producto.create({
         nombre,
@@ -51,15 +48,36 @@ class ProductoController {
   async getProductos(req, res) {
     try {
       const productos = await Producto.findAll({
-        include:[
-            {
-                model: Marca, as: 'marca',attributes: ["nombre"]
-            },
-            {
-                model: Categoria, as: 'categoria',attributes: ["nombre"]
-            }
+        include: [
+          {
+            model: Marca, 
+            as: 'marca', 
+            attributes: ["nombre"] 
+          },
+          {
+            model: Categoria, 
+            as: 'categoria', 
+            attributes: ["nombre"] 
+          },
+          {
+            model: ProductoColor,
+            as: 'productoColores',
+            attributes: ["id", "color", "imagenUrl"] 
+          },
+          { 
+            model: ProductoTalla,
+            as: 'productoTallas',
+            include: [
+              {
+                model: Talla,
+                as: 'tallaInfo',
+                attributes: ["valor"]
+              }
+            ] 
+          }
         ]
       });
+
       res.status(200).send({
         message: "Productos obtenidos exitosamente.",
         total: productos.length,
@@ -73,15 +91,12 @@ class ProductoController {
           categoriaId: p.categoriaId,
           createdAt: p.createdAt,
           updatedAt: p.updatedAt,
-          marca: {
-            nombre: p.marca?.nombre || null
-          },
-          categoria: {
-            nombre: p.categoria?.nombre || null
-          }
+          marca: { nombre: p.marca?.nombre || null },
+          categoria: { nombre: p.categoria?.nombre || null },
+          colores: p.colores || [],
+          tallas: p.tallas || []
         }))
       });
-
     } catch (err) {
       res.status(500).send({ message: err.message || "Error al obtener los productos." });
     }
@@ -90,11 +105,53 @@ class ProductoController {
   async getProductoById(req, res) {
     const id = req.params.id;
     try {
-      const producto = await Producto.findByPk(id);
-      if (!producto) {
-        return res.status(404).send({ message: "Producto no encontrado." });
-      }
-      res.status(200).send(producto);
+      const p = await Producto.findByPk(id, {
+        include: [
+          {
+            model: Marca,
+            as: 'marca',
+            attributes: ["nombre"] 
+          },
+          {
+            model: Categoria,
+            as: 'categoria',
+            attributes: ["nombre"] 
+          },
+          { 
+            model: ProductoColor,
+            as: 'productoColores',
+            attributes: ["id", "color", "imagenUrl"] 
+          },
+          {
+            model: ProductoTalla,
+            as: 'productoTallas', 
+            include:[
+              {
+                model: Talla, as: 'tallaInfo', attributes: ["valor"]
+              }
+            ] 
+          }
+        ]
+      });
+
+      if (!p) return res.status(404).send({ message: "Producto no encontrado." });
+
+      res.status(200).send({
+        id: p.id,
+        nombre: p.nombre,
+        descripcion: p.descripcion,
+        precio: p.precio,
+        stock: p.stock,
+        marcaId: p.marcaId,
+        categoriaId: p.categoriaId,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+        marca: { nombre: p.marca?.nombre || null },
+        categoria: { nombre: p.categoria?.nombre || null },
+        colores: p.colores || [],
+        tallas: p.tallas || []
+      });
+
     } catch (err) {
       res.status(500).send({ message: "Error al obtener el producto." });
     }
@@ -102,26 +159,33 @@ class ProductoController {
 
   async updateProducto(req, res) {
     const id = req.params.id;
-    const { nombre, descripcion, precio, stock} = req.body;
+    const { nombre, descripcion, precio, stock, marcaId, categoriaId } = req.body;
 
     try {
       const producto = await Producto.findByPk(id);
-      if (!producto) {
-        return res.status(404).send({ message: "Producto no encontrado." });
-      }
+      if (!producto) return res.status(404).send({ message: "Producto no encontrado." });
 
-      // Validar nombre único si cambia
       if (nombre && nombre !== producto.nombre) {
         const existente = await Producto.findOne({ where: { nombre } });
-        if (existente) {
-          return res.status(400).send({ message: "Ya existe un producto con ese nombre." });
-        }
+        if (existente) return res.status(400).send({ message: "Ya existe un producto con ese nombre." });
         producto.nombre = nombre;
       }
 
       if (descripcion !== undefined) producto.descripcion = descripcion;
       if (precio !== undefined) producto.precio = precio;
       if (stock !== undefined) producto.stock = stock;
+
+      if (marcaId !== undefined) {
+        const marca = await Marca.findByPk(marcaId);
+        if (!marca) return res.status(400).send({ message: "La marca especificada no existe." });
+        producto.marcaId = marcaId;
+      }
+
+      if (categoriaId !== undefined) {
+        const categoria = await Categoria.findByPk(categoriaId);
+        if (!categoria) return res.status(400).send({ message: "La categoría especificada no existe." });
+        producto.categoriaId = categoriaId;
+      }
 
       await producto.save();
 
@@ -139,7 +203,6 @@ class ProductoController {
 
     try {
       const deleted = await Producto.destroy({ where: { id } });
-
       if (deleted === 1) {
         res.send({ message: "Producto eliminado exitosamente." });
       } else {

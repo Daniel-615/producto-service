@@ -2,7 +2,7 @@ const { Model, DataTypes } = require('sequelize');
 
 class ProductoColor extends Model {
   get Color() {
-    return this.Color;
+    return this.color; // corregido para evitar recursión infinita
   }
   set Color(v) {
     this.color = v;
@@ -11,7 +11,6 @@ class ProductoColor extends Model {
   get ImagenUrl() {
     return this.imagenUrl;
   }
-
   set ImagenUrl(url) {
     this.imagenUrl = url;
   }
@@ -20,10 +19,20 @@ class ProductoColor extends Model {
 module.exports = (sequelize) => {
   ProductoColor.init(
     {
-      color: {
-        type: DataTypes.STRING,
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      productoId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        unique: true
+        references: {
+          model: 'producto', // nombre de la tabla de productos
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       imagenUrl: {
         type: DataTypes.STRING,
@@ -32,10 +41,24 @@ module.exports = (sequelize) => {
     },
     {
       sequelize,
-      modelName: 'productoColor',
+      modelName: 'ProductoColor',
       tableName: 'producto_color',
       timestamps: false,
+      indexes: [
+        {
+          unique: true,
+          fields: ['productoId', 'colorId'], 
+        },
+      ],
     }
   );
+
+  ProductoColor.associate = (models) => {
+    ProductoColor.belongsTo(models.Producto, {
+      foreignKey: 'productoId',
+      as: 'producto',
+    });
+  };
+
   return ProductoColor;
 };

@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const dbConfig = require('../config/db.config.js');
+const productoColor = require('./productoColor.js');
 
 class Database {
   constructor() {
@@ -56,11 +57,23 @@ class Database {
     Producto.belongsTo(Categoria, { foreignKey: 'categoriaId', as: 'categoria' });
     Categoria.hasMany(Producto, { foreignKey: 'categoriaId', as: 'productos' });
 
-    Producto.belongsToMany(Talla, { through: ProductoTalla, foreignKey: 'productoId' });
-    Talla.belongsToMany(Producto, { through: ProductoTalla, foreignKey: 'tallaId' });
+    // Relación directa con ProductoTalla
+    Producto.hasMany(ProductoTalla, { foreignKey: 'productoId', as: 'productoTallas' });
+    ProductoTalla.belongsTo(Producto, { foreignKey: 'productoId', as: 'producto' });
+
+    Talla.hasMany(ProductoTalla, { foreignKey: 'tallaId', as: 'productoTallas' });
+    ProductoTalla.belongsTo(Talla, { foreignKey: 'tallaId', as: 'tallaInfo' });
 
     Producto.belongsToMany(Color, { through: ProductoColor, foreignKey: 'productoId' });
     Color.belongsToMany(Producto, { through: ProductoColor, foreignKey: 'colorId' });
+
+    //Producto con color
+    Producto.hasMany(ProductoColor,{foreignKey: 'productoId', as : 'productoColores'})
+    ProductoColor.belongsTo(Producto,{ foreignKey: 'productoId', as: 'producto'})
+
+    //Color del producto (hexadecimal)
+    Color.hasMany(ProductoColor, {foreignKey: 'colorId', as: 'productoColores'})
+    ProductoColor.belongsTo(Color, {foreignKey: 'colorId', as: 'colorInfo'})
   }
 
   get sequelize() {

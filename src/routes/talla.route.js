@@ -12,7 +12,6 @@ class TallaRoute{
             try{
                 this.controller.createTalla(req,res);
             }catch(err){
-                console.error("Error en la ruta POST /talla:", err);
                 res.status(500).json({ error: "Error en el servidor" });
             }
         })
@@ -20,7 +19,6 @@ class TallaRoute{
             try{
                 this.controller.getTallaById(req,res);
             }catch(err){
-                console.error("Error en la ruta GET /talla/:id:", err);
                 res.status(500).json({ error: "Error en el servidor" });
             }
         })
@@ -28,7 +26,6 @@ class TallaRoute{
             try{
                 this.controller.getTallas(req,res);
             }catch(err){
-                console.error("Error en la ruta GET /talla:", err);
                 res.status(500).json({ error: "Error en el servidor" });
             }
         })
@@ -36,7 +33,6 @@ class TallaRoute{
             try{
                 this.controller.updateTalla(req,res);
             }catch(err){
-                console.error("Error en la ruta PUT /talla/:id:", err);
                 res.status(500).json({ error: "Error en el servidor" });
             }
         })
@@ -44,7 +40,6 @@ class TallaRoute{
             try{
                 this.controller.deleteTalla(req,res);
             }catch(err){
-                console.error("Error en la ruta DELETE /talla/:id:", err);
                 res.status(500).json({ error: "Error en el servidor" });
             }
         })

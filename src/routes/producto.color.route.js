@@ -13,9 +13,14 @@ class ProductoColorRoute {
   registerRoutes() {
     // Crear color con imagen
     this.router.post("/", upload.single("imagen"), async (req, res) => {
-      const imagenUrl = req.file ? `/uploads/${req.file.filename}` : null;
-      req.body.imagenUrl = imagenUrl;
-      await this.controller.createProductoColor(req, res);
+      try{
+        const imagenUrl = req.file ? `/uploads/${req.file.filename}` : null;
+        
+        req.body.imagenUrl = imagenUrl;
+        await this.controller.createProductoColor(req, res);
+      }catch(err){
+        console.log(err.message)
+      }
     });
 
     // Obtener todos los colores
