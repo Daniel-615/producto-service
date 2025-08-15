@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const path = require('path');
-const { APP_PORT,FRONTEND_URL } = require('./src/config/config.js')
+const { APP_PORT, FRONTEND_URL } = require('./src/config/config.js');
 const db = require('./src/models'); 
+
+// Rutas
 const CategoriaRoute = require('./src/routes/categoria.route.js');
 const ProductoRoute = require('./src/routes/producto.route.js');
 const MarcaRoute = require('./src/routes/marca.route.js');
@@ -16,7 +17,10 @@ class Server {
   constructor() {
     this.app = express();
     this.port = APP_PORT;
-    this.app.use(express.json()); // Middleware para parsear JSON
+
+    // Middlewares principales
+    this.app.use(express.json()); 
+    this.app.use(express.urlencoded({ extended: true })); 
     this.configureMiddlewares();
     this.configureRoutes();
     this.connectDatabase();
@@ -25,11 +29,11 @@ class Server {
   configureMiddlewares() {
     this.app.use(cors({
       origin: FRONTEND_URL,
-      credentials: true // Permitir cookies y credenciales
+      credentials: true 
     }));
+
+    // Carpeta para servir imágenes
     this.app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-    this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: true }));
   }
 
   configureRoutes() {
@@ -44,7 +48,7 @@ class Server {
 
   async connectDatabase() {
     try {
-      await db.sequelize.sync({alter: true}); // o sync({ force: true }) si estás en desarrollo
+      await db.sequelize.sync({ alter: true });
       console.log('Base de datos conectada y sincronizada.');
 
       const tables = await db.sequelize.getQueryInterface().showAllTables();
