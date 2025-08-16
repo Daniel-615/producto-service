@@ -5,7 +5,6 @@ class ProductoColorController {
   async createProductoColor(req, res) {
   const { colorId, productoId } = req.body;
   const imagenUrl = req.body.imagenUrl;
-  console.log(req.body.imagenUrl)
   if (!colorId || !productoId) {
     return res.status(400).send({ message: "colorId y productoId son obligatorios." });
   }

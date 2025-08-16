@@ -62,7 +62,7 @@ class ProductoController {
           {
             model: ProductoColor,
             as: 'productoColores',
-            attributes: ["id", "color", "imagenUrl"] 
+            attributes: ["id", "imagenUrl"] 
           },
           { 
             model: ProductoTalla,
@@ -93,8 +93,8 @@ class ProductoController {
           updatedAt: p.updatedAt,
           marca: { nombre: p.marca?.nombre || null },
           categoria: { nombre: p.categoria?.nombre || null },
-          colores: p.colores || [],
-          tallas: p.tallas || []
+          colores: p.productoColores || [],
+          tallas: p.productoTallas || []
         }))
       });
     } catch (err) {
@@ -105,53 +105,11 @@ class ProductoController {
   async getProductoById(req, res) {
     const id = req.params.id;
     try {
-      const p = await Producto.findByPk(id, {
-        include: [
-          {
-            model: Marca,
-            as: 'marca',
-            attributes: ["nombre"] 
-          },
-          {
-            model: Categoria,
-            as: 'categoria',
-            attributes: ["nombre"] 
-          },
-          { 
-            model: ProductoColor,
-            as: 'productoColores',
-            attributes: ["id", "color", "imagenUrl"] 
-          },
-          {
-            model: ProductoTalla,
-            as: 'productoTallas', 
-            include:[
-              {
-                model: Talla, as: 'tallaInfo', attributes: ["valor"]
-              }
-            ] 
-          }
-        ]
-      });
-
-      if (!p) return res.status(404).send({ message: "Producto no encontrado." });
-
-      res.status(200).send({
-        id: p.id,
-        nombre: p.nombre,
-        descripcion: p.descripcion,
-        precio: p.precio,
-        stock: p.stock,
-        marcaId: p.marcaId,
-        categoriaId: p.categoriaId,
-        createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
-        marca: { nombre: p.marca?.nombre || null },
-        categoria: { nombre: p.categoria?.nombre || null },
-        colores: p.colores || [],
-        tallas: p.tallas || []
-      });
-
+      const producto = await Producto.findByPk(id);
+      if (!producto) {
+        return res.status(404).send({ message: "Producto no encontrado." });
+      }
+      res.status(200).send(producto);
     } catch (err) {
       res.status(500).send({ message: "Error al obtener el producto." });
     }

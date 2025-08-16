@@ -1,6 +1,14 @@
-const express = require('express');
-const ProductoColorController = require('../controllers/producto.color.controller.js');
-const upload = require('../middleware/uploadImage.js');
+const express = require("express");
+const cloudinary = require("cloudinary").v2;  // Importa Cloudinary
+const ProductoColorController = require("../controllers/producto.color.controller.js");
+const upload = require("../middleware/uploadImage.js");
+
+// Configuración de Cloudinary
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 class ProductoColorRoute {
   constructor(app) {
@@ -13,13 +21,42 @@ class ProductoColorRoute {
   registerRoutes() {
     // Crear color con imagen
     this.router.post("/", upload.single("imagen"), async (req, res) => {
-      try{
-        const imagenUrl = req.file ? `/uploads/${req.file.filename}` : null;
-        
+      try {
+        let imagenUrl = null;
+
+        if (req.file) {
+          // Usar el método upload_stream para subir el buffer de la imagen
+          const uploadResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              { 
+                public_id: req.file.originalname.split('.')[0], 
+                tags: 'producto_color' 
+              },
+              (error, result) => {
+                if (error) {
+                  reject(error);
+                } else {
+                  resolve(result);
+                }
+              }
+            );
+            // Subir el archivo usando el buffer
+            stream.end(req.file.buffer);
+          });
+
+          console.log(uploadResult);
+          imagenUrl = uploadResult.secure_url; // Obtén la URL segura de la imagen
+        }
+
+        if (!imagenUrl) {
+          return res.status(400).send({ message: "No se pudo guardar la imagen en Cloudinary" });
+        }
+
         req.body.imagenUrl = imagenUrl;
         await this.controller.createProductoColor(req, res);
-      }catch(err){
-        console.log(err.message)
+      } catch (err) {
+        console.error("Error al subir imagen a Cloudinary:", err.message);
+        res.status(500).send({ message: "Error al subir imagen a Cloudinary" });
       }
     });
 
@@ -33,11 +70,40 @@ class ProductoColorRoute {
       this.controller.getProductoColorById(req, res);
     });
 
-    // Actualizar color (puede incluir nueva imagen)
+    // Actualizar color con nueva imagen
     this.router.put("/:id", upload.single("imagen"), async (req, res) => {
-      const imagenUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
-      req.body.imagenUrl = imagenUrl;
-      await this.controller.updateProductoColor(req, res);
+      try {
+        let imagenUrl = undefined;
+
+        if (req.file) {
+          // Usar el método upload_stream para subir el buffer de la imagen
+          const uploadResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              { 
+                public_id: req.file.originalname.split('.')[0], 
+                tags: 'producto_color' 
+              },
+              (error, result) => {
+                if (error) {
+                  reject(error);
+                } else {
+                  resolve(result);
+                }
+              }
+            );
+            // Subir el archivo usando el buffer
+            stream.end(req.file.buffer);
+          });
+
+          imagenUrl = uploadResult.secure_url;
+        }
+
+        req.body.imagenUrl = imagenUrl;
+        await this.controller.updateProductoColor(req, res);
+      } catch (err) {
+        console.error("Error al actualizar imagen en Cloudinary:", err.message);
+        res.status(500).send({ message: "Error al actualizar imagen en Cloudinary" });
+      }
     });
 
     // Eliminar color
