@@ -28,7 +28,7 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'producto', // nombre de la tabla de productos
+          model: 'productos', 
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -44,12 +44,6 @@ module.exports = (sequelize) => {
       modelName: 'ProductoColor',
       tableName: 'producto_color',
       timestamps: false,
-      indexes: [
-        {
-          unique: true,
-          fields: ['productoId'], 
-        },
-      ],
     }
   );
 

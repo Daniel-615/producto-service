@@ -3,41 +3,67 @@ const ProductoColor = db.getModel("ProductoColor");
 
 class ProductoColorController {
   async createProductoColor(req, res) {
-  const { colorId, productoId } = req.body;
-  const imagenUrl = req.body.imagenUrl;
-  if (!colorId || !productoId) {
-    return res.status(400).send({ message: "colorId y productoId son obligatorios." });
-  }
-
-  try {
-    const existente = await ProductoColor.findOne({
-      where: { colorId, productoId }
-    });
-
-    if (existente) {
-      return res.status(400).send({ message: "Ese producto ya tiene ese color." });
+    const { colorId, productoId } = req.body;
+    const imagenUrl = req.body.imagenUrl;
+    if (!colorId || !productoId) {
+      return res.status(400).send({ message: "colorId y productoId son obligatorios." });
     }
 
-    const nuevoColor = await ProductoColor.create({
-      colorId,
-      productoId,
-      imagenUrl
-    });
+    try {
+      const existente = await ProductoColor.findOne({
+        where: { colorId, productoId }
+      });
 
-    res.status(201).send({
-      message: "Color de producto creado exitosamente.",
-      data: nuevoColor
-    });
-  } catch (err) {
-    res.status(500).send({ message: err.message || "Error al crear el color de producto." });
+      if (existente) {
+        return res.status(400).send({ message: "Ese producto ya tiene ese color." });
+      }
+
+      const nuevoColor = await ProductoColor.create({
+        colorId,
+        productoId,
+        imagenUrl
+      });
+
+      res.status(201).send({
+        message: "Color de producto creado exitosamente.",
+        data: nuevoColor
+      });
+    } catch (err) {
+      console.error("Error: ", err)
+      res.status(500).send({ message: err.message || "Error al crear el color de producto." });
+    }
   }
-}
-
 
   async getProductoColor(req, res) {
     try {
-      const colores = await ProductoColor.findAll();
-      res.send(colores);
+      const colores = await ProductoColor.findAll({
+        include: [
+          {
+            model: db.getModel("Color"),
+            as: 'colorInfo',
+            attributes: ["nombre"]
+          },
+          {
+            model: db.getModel("Producto"),
+            as: 'producto',
+            attributes: ["nombre"]
+          }
+        ]
+      });
+
+      const resultado = colores.map(pc => ({
+        id: pc.id,
+        productoId: pc.productoId,
+        colorId: pc.colorId,
+        imagenUrl: pc.imagenUrl,
+        nombreColor: pc.colorInfo?.nombre || null,
+        nombreProducto: pc.producto?.nombre || null // incluimos nombre del producto
+      }));
+
+      res.send({
+        success: true,
+        data: resultado
+      });
     } catch (err) {
       res.status(500).send({ message: err.message || "Error al obtener los colores." });
     }
@@ -46,11 +72,36 @@ class ProductoColorController {
   async getProductoColorById(req, res) {
     const id = req.params.id;
     try {
-      const color = await ProductoColor.findByPk(id);
+      const color = await ProductoColor.findByPk(id, {
+        include: [
+          {
+            model: db.getModel("Color"),
+            as: 'colorInfo',
+            attributes: ["nombre"]
+          },
+          {
+            model: db.getModel("Producto"),
+            as: 'productoInfo',
+            attributes: ["nombre"]
+          }
+        ]
+      });
+
       if (!color) {
         return res.status(404).send({ message: "Color no encontrado." });
       }
-      res.send(color);
+
+      res.send({
+        success: true,
+        data: {
+          id: color.id,
+          productoId: color.productoId,
+          colorId: color.colorId,
+          imagenUrl: color.imagenUrl,
+          nombreColor: color.colorInfo?.nombre || null,
+          nombreProducto: color.productoInfo?.nombre || null
+        }
+      });
     } catch (err) {
       res.status(500).send({ message: "Error al obtener el color." });
     }

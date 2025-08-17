@@ -5,7 +5,7 @@ const path = require("path");
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png/;
+  const allowedTypes = /jpeg|jpg|png|webp/;
   const ext = path.extname(file.originalname).toLowerCase();
   const mimetype = allowedTypes.test(file.mimetype);
   const extname = allowedTypes.test(ext);
@@ -13,7 +13,9 @@ const fileFilter = (req, file, cb) => {
   if (mimetype && extname) {
     cb(null, true);
   } else {
-    cb(new Error("Solo se permiten imágenes en formato .jpeg, .jpg o .png"));
+    // No lanzar error directamente, sino pasarlo al request
+    req.fileValidationError = "Solo se permiten imágenes en formato .jpeg, .jpg, .png o .webp";
+    cb(null, false);
   }
 };
 

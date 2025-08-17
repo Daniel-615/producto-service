@@ -1,13 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 
 class Talla extends Model {
-  get Valor() {
-    return this.valor;
-  }
-
-  set Valor(v) {
-    this.valor = v;
-  }
 }
 
 module.exports = (sequelize) => {

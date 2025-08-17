@@ -1,10 +1,10 @@
 const express = require('express');
-const ProductoTallaController = require('../controllers/producto.talla.controller.js');
+const ProductoTallaColorController = require('../controllers/producto.talla.color.controller.js');
 
 class ProductoTallaRoute {
   constructor(app) {
     this.router = express.Router();
-    this.controller = new ProductoTallaController();
+    this.controller = new ProductoTallaColorController();
     this.registerRoutes();
     app.use("/producto-service/producto-talla", this.router);
   }

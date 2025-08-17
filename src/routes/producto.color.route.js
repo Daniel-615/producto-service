@@ -23,7 +23,13 @@ class ProductoColorRoute {
     this.router.post("/", upload.single("imagen"), async (req, res) => {
       try {
         let imagenUrl = null;
-
+        if(req.fileValidationError){
+          return res
+            .status(400)
+            .send({
+              message: req.fileValidationError
+            })
+        }
         if (req.file) {
           // Usar el método upload_stream para subir el buffer de la imagen
           const uploadResult = await new Promise((resolve, reject) => {
@@ -44,7 +50,6 @@ class ProductoColorRoute {
             stream.end(req.file.buffer);
           });
 
-          console.log(uploadResult);
           imagenUrl = uploadResult.secure_url; // Obtén la URL segura de la imagen
         }
 
@@ -55,7 +60,7 @@ class ProductoColorRoute {
         req.body.imagenUrl = imagenUrl;
         await this.controller.createProductoColor(req, res);
       } catch (err) {
-        console.error("Error al subir imagen a Cloudinary:", err.message);
+        console.error(err)
         res.status(500).send({ message: "Error al subir imagen a Cloudinary" });
       }
     });

@@ -2,14 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { APP_PORT, FRONTEND_URL } = require('./src/config/config.js');
-const db = require('./src/models'); 
-
-// Rutas
+const db = require('./src/models/index.js'); 
+  
 const CategoriaRoute = require('./src/routes/categoria.route.js');
 const ProductoRoute = require('./src/routes/producto.route.js');
 const MarcaRoute = require('./src/routes/marca.route.js');
 const ColorRoute = require('./src/routes/color.route.js');
-const ProductoTallaRoute = require('./src/routes/producto.talla.route.js');
+const ProductoTallaColorRoute = require('./src/routes/producto.talla.color.route.js');
 const ProductoColorRoute = require('./src/routes/producto.color.route.js');
 const TallaRoute = require('./src/routes/talla.route.js');
 
@@ -42,13 +41,13 @@ class Server {
     new CategoriaRoute(this.app);
     new ProductoRoute(this.app);
     new ColorRoute(this.app);
-    new ProductoTallaRoute(this.app);
+    new ProductoTallaColorRoute(this.app);
     new ProductoColorRoute(this.app);
   }
 
   async connectDatabase() {
     try {
-      await db.sequelize.sync({ alter: true });
+      await db.sequelize.sync({ alter: true }); 
       console.log('Base de datos conectada y sincronizada.');
 
       const tables = await db.sequelize.getQueryInterface().showAllTables();

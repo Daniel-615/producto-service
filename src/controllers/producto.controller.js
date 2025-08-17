@@ -3,27 +3,25 @@ const Producto = db.getModel("Producto");
 const Marca = db.getModel("Marca");
 const Categoria = db.getModel("Categoria");
 const ProductoColor = db.getModel("ProductoColor");
-const ProductoTalla = db.getModel("ProductoTalla");
-const Talla=db.getModel("Talla");
+const ProductoTallaColor = db.getModel("ProductoTallaColor");
+const Talla = db.getModel("Talla");
+const Color = db.getModel("Color");
 
 class ProductoController {
   async createProducto(req, res) {
-    const { nombre, descripcion, precio, stock, marcaId, categoriaId } = req.body;
+    const { nombre, descripcion, precio, marcaId, categoriaId } = req.body;
 
-    if (!nombre || !descripcion || precio === undefined || stock === undefined || !marcaId || !categoriaId) {
+    if (!nombre || !descripcion || precio === undefined || !marcaId || !categoriaId) {
       return res.status(400).send({ message: "Todos los campos son obligatorios (incluyendo marcaId y categoriaId)." });
     }
 
     try {
-      // Validar existencia de la marca
       const marca = await Marca.findByPk(marcaId);
       if (!marca) return res.status(400).send({ message: "La marca especificada no existe." });
 
-      // Validar existencia de la categoría
       const categoria = await Categoria.findByPk(categoriaId);
       if (!categoria) return res.status(400).send({ message: "La categoría especificada no existe." });
 
-      // Validar producto único por nombre
       const existente = await Producto.findOne({ where: { nombre } });
       if (existente) return res.status(400).send({ message: "El producto ya existe." });
 
@@ -31,7 +29,6 @@ class ProductoController {
         nombre,
         descripcion,
         precio,
-        stock,
         marcaId,
         categoriaId
       });
@@ -41,6 +38,7 @@ class ProductoController {
         producto: nuevoProducto
       });
     } catch (err) {
+      console.log(err);
       res.status(500).send({ message: err.message || "Error al crear el producto." });
     }
   }
@@ -49,31 +47,30 @@ class ProductoController {
     try {
       const productos = await Producto.findAll({
         include: [
-          {
-            model: Marca, 
-            as: 'marca', 
-            attributes: ["nombre"] 
-          },
-          {
-            model: Categoria, 
-            as: 'categoria', 
-            attributes: ["nombre"] 
-          },
+          { model: Marca, as: "marca", attributes: ["nombre"] },
+          { model: Categoria, as: "categoria", attributes: ["nombre"] },
           {
             model: ProductoColor,
-            as: 'productoColores',
-            attributes: ["id", "imagenUrl"] 
-          },
-          { 
-            model: ProductoTalla,
-            as: 'productoTallas',
+            as: "productoColores",
+            attributes: ["id", "imagenUrl"],
             include: [
               {
-                model: Talla,
-                as: 'tallaInfo',
-                attributes: ["valor"]
+                model: Color,
+                as: "colorInfo",
+                attributes: ["codigoHex"]
+              },
+              {
+                model: ProductoTallaColor,
+                as: "tallasColores", 
+                include: [
+                  {
+                    model: Talla,
+                    as: "tallaInfo",
+                    attributes: ["valor"]
+                  }
+                ]
               }
-            ] 
+            ]
           }
         ]
       });
@@ -81,23 +78,27 @@ class ProductoController {
       res.status(200).send({
         message: "Productos obtenidos exitosamente.",
         total: productos.length,
-        productos: productos.map(p => ({
+        productos: productos.map((p) => ({
           id: p.id,
           nombre: p.nombre,
           descripcion: p.descripcion,
           precio: p.precio,
-          stock: p.stock,
-          marcaId: p.marcaId,
-          categoriaId: p.categoriaId,
-          createdAt: p.createdAt,
-          updatedAt: p.updatedAt,
           marca: { nombre: p.marca?.nombre || null },
           categoria: { nombre: p.categoria?.nombre || null },
-          colores: p.productoColores || [],
-          tallas: p.productoTallas || []
+          colores: p.productoColores.map((pc) => ({
+            id: pc.id,
+            imagenUrl: pc.imagenUrl,
+            codigoHex: pc.colorInfo?.codigoHex || null,
+            tallas: pc.tallasColores.map((tc) => ({
+              id: tc.id,
+              valor: tc.tallaInfo?.valor || null,
+              stock: tc.stock
+            }))
+          }))
         }))
       });
     } catch (err) {
+      console.log(err);
       res.status(500).send({ message: err.message || "Error al obtener los productos." });
     }
   }
@@ -105,10 +106,36 @@ class ProductoController {
   async getProductoById(req, res) {
     const id = req.params.id;
     try {
-      const producto = await Producto.findByPk(id);
+      const producto = await Producto.findByPk(id, {
+        include: [
+          { model: Marca, as: "marca", attributes: ["nombre"] },
+          { model: Categoria, as: "categoria", attributes: ["nombre"] },
+          {
+            model: ProductoColor,
+            as: "productoColores",
+            attributes: ["id", "imagenUrl"],
+            include: [
+              {
+                model: Color,
+                as: "colorInfo",
+                attributes: ["codigoHex"]
+              },
+              {
+                model: ProductoTallaColor,
+                as: "tallasColores",
+                include: [
+                  { model: Talla, as: "tallaInfo", attributes: ["valor"] }
+                ]
+              }
+            ]
+          }
+        ]
+      });
+
       if (!producto) {
         return res.status(404).send({ message: "Producto no encontrado." });
       }
+
       res.status(200).send(producto);
     } catch (err) {
       res.status(500).send({ message: "Error al obtener el producto." });
@@ -117,7 +144,7 @@ class ProductoController {
 
   async updateProducto(req, res) {
     const id = req.params.id;
-    const { nombre, descripcion, precio, stock, marcaId, categoriaId } = req.body;
+    const { nombre, descripcion, precio, marcaId, categoriaId } = req.body;
 
     try {
       const producto = await Producto.findByPk(id);

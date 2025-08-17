@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize');
 const dbConfig = require('../config/db.config.js');
-const productoColor = require('./productoColor.js');
 
 class Database {
   constructor() {
@@ -33,47 +32,45 @@ class Database {
   _loadModels() {
     const sequelize = this._sequelize;
 
-
     // Catálogos y productos
     this.models.Marca = require('./marca.js')(sequelize);
     this.models.Categoria = require('./categoria.js')(sequelize);
     this.models.Producto = require('./producto.js')(sequelize);
     this.models.Talla = require('./talla.js')(sequelize);
     this.models.Color = require('./color.js')(sequelize);
-    this.models.ProductoTalla = require('./productoTalla.js')(sequelize);
     this.models.ProductoColor = require('./productoColor.js')(sequelize);
+    this.models.ProductoTallaColor = require('./productoTallaColor.js')(sequelize);
   }
 
   _associateModels() {
     const {
       Marca, Categoria, Producto, Talla, Color,
-      ProductoTalla, ProductoColor
+      ProductoColor, ProductoTallaColor
     } = this.models;
 
-    // Relaciones Producto
+    // Producto ↔ Marca
     Producto.belongsTo(Marca, { foreignKey: 'marcaId', as: 'marca' });
     Marca.hasMany(Producto, { foreignKey: 'marcaId', as: 'productos' });
 
+    // Producto ↔ Categoria
     Producto.belongsTo(Categoria, { foreignKey: 'categoriaId', as: 'categoria' });
     Categoria.hasMany(Producto, { foreignKey: 'categoriaId', as: 'productos' });
 
-    // Relación directa con ProductoTalla
-    Producto.hasMany(ProductoTalla, { foreignKey: 'productoId', as: 'productoTallas' });
-    ProductoTalla.belongsTo(Producto, { foreignKey: 'productoId', as: 'producto' });
+    // Producto ↔ ProductoColor
+    Producto.hasMany(ProductoColor, { foreignKey: 'productoId', as: 'productoColores' });
+    ProductoColor.belongsTo(Producto, { foreignKey: 'productoId', as: 'producto' });
 
-    Talla.hasMany(ProductoTalla, { foreignKey: 'tallaId', as: 'productoTallas' });
-    ProductoTalla.belongsTo(Talla, { foreignKey: 'tallaId', as: 'tallaInfo' });
+    // Color ↔ ProductoColor
+    Color.hasMany(ProductoColor, { foreignKey: 'colorId', as: 'productoColores' });
+    ProductoColor.belongsTo(Color, { foreignKey: 'colorId', as: 'colorInfo' });
 
-    Producto.belongsToMany(Color, { through: ProductoColor, foreignKey: 'productoId' });
-    Color.belongsToMany(Producto, { through: ProductoColor, foreignKey: 'colorId' });
+    // ProductoColor ↔ ProductoTallaColor
+    ProductoColor.hasMany(ProductoTallaColor, { foreignKey: 'id_producto_color', as: 'tallasColores' });
+    ProductoTallaColor.belongsTo(ProductoColor, { foreignKey: 'id_producto_color', as: 'productoColor' });
 
-    //Producto con color
-    Producto.hasMany(ProductoColor,{foreignKey: 'productoId', as : 'productoColores'})
-    ProductoColor.belongsTo(Producto,{ foreignKey: 'productoId', as: 'producto'})
-
-    //Color del producto (hexadecimal)
-    Color.hasMany(ProductoColor, {foreignKey: 'colorId', as: 'productoColores'})
-    ProductoColor.belongsTo(Color, {foreignKey: 'colorId', as: 'colorInfo'})
+    // Talla ↔ ProductoTallaColor
+    Talla.hasMany(ProductoTallaColor, { foreignKey: 'id_talla', as: 'productoTallas' });
+    ProductoTallaColor.belongsTo(Talla, { foreignKey: 'id_talla', as: 'tallaInfo' });
   }
 
   get sequelize() {
