@@ -81,7 +81,7 @@ class ProductoColorController {
           },
           {
             model: db.getModel("Producto"),
-            as: 'productoInfo',
+            as: 'producto',
             attributes: ["nombre"]
           }
         ]
@@ -99,46 +99,41 @@ class ProductoColorController {
           colorId: color.colorId,
           imagenUrl: color.imagenUrl,
           nombreColor: color.colorInfo?.nombre || null,
-          nombreProducto: color.productoInfo?.nombre || null
+          nombreProducto: color.producto?.nombre || null
         }
       });
     } catch (err) {
+      console.log(err.message)
       res.status(500).send({ message: "Error al obtener el color." });
     }
   }
 
   async updateProductoColor(req, res) {
     const id = req.params.id;
-    const { color } = req.body;
     const imagenUrl = req.body.imagenUrl;
 
     try {
-      const colorObj = await ProductoColor.findByPk(id);
-      if (!colorObj) {
-        return res.status(404).send({ message: "Color no encontrado." });
+      const pc = await ProductoColor.findByPk(id);
+      if (!pc) {
+        return res.status(404).send({ message: "ProductoColor no encontrado." });
       }
 
-      // Validar nombre único si se cambia
-      if (color && color !== colorObj.color) {
-        const existente = await ProductoColor.findOne({ where: { color } });
-        if (existente) {
-          return res.status(400).send({ message: "Ya existe un color con ese nombre." });
-        }
-        colorObj.color = color;
+      if (imagenUrl !== undefined) {
+        pc.imagenUrl = imagenUrl;
       }
 
-      if (imagenUrl !== undefined) colorObj.imagenUrl = imagenUrl;
-
-      await colorObj.save();
+      await pc.save();
 
       res.send({
-        message: "Color actualizado.",
-        color: colorObj
+        message: "ProductoColor actualizado.",
+        data: pc
       });
     } catch (err) {
-      res.status(500).send({ message: "Error al actualizar el color." });
+      console.error(err);
+      res.status(500).send({ message: "Error al actualizar ProductoColor." });
     }
   }
+
 
   async deleteProductoColor(req, res) {
     const id = req.params.id;
