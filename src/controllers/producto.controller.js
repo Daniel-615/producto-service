@@ -49,39 +49,66 @@ class ProductoController {
 
   async getProductos(req, res) {
     try {
+      const { categoria, page = 1, limit = 10 } = req.query;
+
+      const pageInt = parseInt(page, 10);
+      const limitInt = parseInt(limit, 10);
+
+      if (isNaN(pageInt) || pageInt < 1) {
+        return res.status(400).send({ message: "El parámetro 'page' debe ser un número entero mayor o igual a 1." });
+      }
+
+      if (isNaN(limitInt) || limitInt < 1) {
+        return res.status(400).send({ message: "El parámetro 'limit' debe ser un número entero mayor o igual a 1." });
+      }
+
+      const whereCategoria = categoria ? { nombre: categoria } : undefined;
+
+      const offset = (pageInt - 1) * limitInt;
+
+      // Para obtener total de productos con filtro de categoría, hacemos un count
+      const totalProductos = await Producto.count({
+        include: [{
+          model: Categoria,
+          as: "categoria",
+          where: whereCategoria,
+          required: !!categoria
+        }]
+      });
+
       const productos = await Producto.findAll({
         include: [
           { model: Marca, as: "marca", attributes: ["nombre"] },
-          { model: Categoria, as: "categoria", attributes: ["nombre"] },
+          {
+            model: Categoria,
+            as: "categoria",
+            attributes: ["nombre"],
+            where: whereCategoria,
+            required: !!categoria
+          },
           {
             model: ProductoColor,
             as: "productoColores",
             attributes: ["id", "imagenUrl"],
             include: [
-              {
-                model: Color,
-                as: "colorInfo",
-                attributes: ["codigoHex"]
-              },
+              { model: Color, as: "colorInfo", attributes: ["codigoHex"] },
               {
                 model: ProductoTallaColor,
-                as: "tallasColores", 
-                include: [
-                  {
-                    model: Talla,
-                    as: "tallaInfo",
-                    attributes: ["valor"]
-                  }
-                ]
+                as: "tallasColores",
+                include: [{ model: Talla, as: "tallaInfo", attributes: ["valor"] }]
               }
             ]
           }
-        ]
+        ],
+        offset,
+        limit: limitInt,
       });
 
       res.status(200).send({
         message: "Productos obtenidos exitosamente.",
-        total: productos.length,
+        total: totalProductos,
+        page: pageInt,
+        limit: limitInt,
         productos: productos.map((p) => ({
           id: p.id,
           nombre: p.nombre,
@@ -109,6 +136,8 @@ class ProductoController {
       res.status(500).send({ message: err.message || "Error al obtener los productos." });
     }
   }
+
+
 
   async getProductoById(req, res) {
     const id = req.params.id;
