@@ -9,9 +9,9 @@ const Color = db.getModel("Color");
 
 class ProductoController {
   async createProducto(req, res) {
-    const { nombre, descripcion, precio, marcaId, categoriaId } = req.body;
+    const { nombre, descripcion, precio, marcaId, categoriaId, peso, alto, ancho, largo } = req.body;
 
-    if (!nombre || !descripcion || precio === undefined || !marcaId || !categoriaId) {
+    if (!nombre || !descripcion || precio === undefined || !marcaId || !categoriaId || !peso || !alto || !ancho ||!largo) {
       return res.status(400).send({ message: "Todos los campos son obligatorios (incluyendo marcaId y categoriaId)." });
     }
 
@@ -30,7 +30,11 @@ class ProductoController {
         descripcion,
         precio,
         marcaId,
-        categoriaId
+        categoriaId,
+        peso,
+        alto,
+        ancho,
+        largo
       });
 
       res.status(201).send({
@@ -83,6 +87,10 @@ class ProductoController {
           nombre: p.nombre,
           descripcion: p.descripcion,
           precio: p.precio,
+          ancho: p.ancho,
+          alto: p.alto,
+          largo: p.largo,
+          peso: p.peso,
           marca: { nombre: p.marca?.nombre || null },
           categoria: { nombre: p.categoria?.nombre || null },
           colores: p.productoColores.map((pc) => ({
@@ -98,7 +106,6 @@ class ProductoController {
         }))
       });
     } catch (err) {
-      console.log(err);
       res.status(500).send({ message: err.message || "Error al obtener los productos." });
     }
   }
@@ -144,7 +151,7 @@ class ProductoController {
 
   async updateProducto(req, res) {
     const id = req.params.id;
-    const { nombre, descripcion, precio, marcaId, categoriaId } = req.body;
+    const { nombre, descripcion, precio, marcaId, categoriaId, alto, ancho, peso, largo } = req.body;
 
     try {
       const producto = await Producto.findByPk(id);
@@ -158,7 +165,10 @@ class ProductoController {
 
       if (descripcion !== undefined) producto.descripcion = descripcion;
       if (precio !== undefined) producto.precio = precio;
-      if (stock !== undefined) producto.stock = stock;
+      if(alto !== undefined ) producto.alto= alto;
+      if(ancho !== undefined) producto.ancho= ancho;
+      if(peso !== undefined) producto.peso=peso;
+      if(largo !== undefined) producto.largo= largo;
 
       if (marcaId !== undefined) {
         const marca = await Marca.findByPk(marcaId);
