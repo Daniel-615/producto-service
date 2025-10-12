@@ -10,16 +10,15 @@ class ColorRoute {
   }
 
   registerRoutes() {
-    // Crear un nuevo color
+
     this.router.post("/", this.controller.createColor.bind(this.controller));
 
-    // Obtener todos los colores
     this.router.get("/", this.controller.getColores.bind(this.controller));
 
-    // Obtener un color por ID
+
     this.router.get("/:id", this.controller.getColoresById.bind(this.controller));
 
-    // Actualizar un color
+
     this.router.put("/:id", this.controller.updateColores.bind(this.controller));
 
   }

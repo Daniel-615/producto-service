@@ -8,6 +8,7 @@ const Talla = db.getModel("Talla");
 const Color = db.getModel("Color");
 
 class ProductoController {
+  
   async createProducto(req, res) {
     const { nombre, descripcion, precio, marcaId, categoriaId, peso, alto, ancho, largo } = req.body;
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { APP_PORT, FRONTEND_URL } = require('./src/config/config.js');
+const { PORT, FRONTEND_URL } = require('./src/config/config.js');
 const db = require('./src/models/index.js'); 
   
 const CategoriaRoute = require('./src/routes/categoria.route.js');
@@ -15,7 +15,7 @@ const TallaRoute = require('./src/routes/talla.route.js');
 class Server {
   constructor() {
     this.app = express();
-    this.port = APP_PORT;
+    this.port = PORT;
 
     // Middlewares principales
     this.app.use(express.json()); 

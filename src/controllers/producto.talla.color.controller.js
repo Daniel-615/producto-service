@@ -126,7 +126,7 @@ class ProductoTallaController {
                             {
                                 model:Producto,
                                 as: 'producto',
-                                attributes: ["precio","nombre"]
+                                attributes: ["precio","nombre","peso","alto","ancho","largo"]
                             }
                         ]
                     }
@@ -166,7 +166,32 @@ class ProductoTallaController {
             res.status(500).send({ message: "Error al actualizar la talla color." });
         }
     }
+    //restar stock 
+    async decrementStock(req, res) {
+        const id = req.params.id;           
+        const { qty } = req.body;           
 
+        if (!qty || isNaN(qty) || Number(qty) <= 0) {
+        return res.status(400).send({ message: "qty inválido" });
+        }
+
+        try {
+        const row = await ProductoTallaColor.findByPk(id);
+        if (!row) return res.status(404).send({ message: "Variante no encontrada." });
+        if (row.stock < qty) {
+            return res.status(409).send({ message: "Stock insuficiente." });
+        }
+
+        // Decremento atómico simple (ideal: con WHERE stock>=qty en un UPDATE crudo)
+        row.stock = row.stock - qty;
+        await row.save();
+
+        return res.send({ success: true, stock: row.stock });
+        } catch (err) {
+        console.error(err);
+        return res.status(500).send({ message: "Error al decrementar stock." });
+        }
+    }
     async deleteProductoTalla(req, res) {
         const id = req.params.id;
 
