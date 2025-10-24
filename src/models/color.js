@@ -14,15 +14,14 @@ class Color extends Model {
   }
 
   set CodigoHex(valor) {
-    this.codigoHex = valor;
+    this.codigoHex = valor
   }
 }
 
 module.exports = (sequelize) => {
   Color.init(
     {
-      nombre: {
-        type: DataTypes.STRING,
+      nombre: {        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
       },

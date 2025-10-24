@@ -40,12 +40,14 @@ class Database {
     this.models.Color = require('./color.js')(sequelize);
     this.models.ProductoColor = require('./productoColor.js')(sequelize);
     this.models.ProductoTallaColor = require('./productoTallaColor.js')(sequelize);
+    this.models.Deseo=require('./deseos.js')(sequelize);
+    this.models.Promocion=require('./promocion.js')(sequelize);
   }
 
   _associateModels() {
     const {
       Marca, Categoria, Producto, Talla, Color,
-      ProductoColor, ProductoTallaColor
+      ProductoColor, ProductoTallaColor, Deseo, Promocion
     } = this.models;
 
     // Producto ↔ Marca
@@ -71,6 +73,9 @@ class Database {
     // Talla ↔ ProductoTallaColor
     Talla.hasMany(ProductoTallaColor, { foreignKey: 'id_talla', as: 'productoTallas' });
     ProductoTallaColor.belongsTo(Talla, { foreignKey: 'id_talla', as: 'tallaInfo' });
+
+    Deseo.belongsTo(Promocion,{ foreignKey: 'promocionId' ,as: 'promocion'})
+    Promocion.hasMany(Deseo, {foreignKey: 'promocionId', as: 'deseos'})
   }
 
   get sequelize() {

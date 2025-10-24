@@ -11,7 +11,8 @@ const ColorRoute = require('./src/routes/color.route.js');
 const ProductoTallaColorRoute = require('./src/routes/producto.talla.color.route.js');
 const ProductoColorRoute = require('./src/routes/producto.color.route.js');
 const TallaRoute = require('./src/routes/talla.route.js');
-
+const DeseoRoute=require("./src/routes/deseo.route.js")
+const PromocionRoute=require("./src/routes/promocion.route.js")
 class Server {
   constructor() {
     this.app = express();
@@ -43,6 +44,8 @@ class Server {
     new ColorRoute(this.app);
     new ProductoTallaColorRoute(this.app);
     new ProductoColorRoute(this.app);
+    new DeseoRoute(this.app);
+    new PromocionRoute(this.app);
   }
 
   async connectDatabase() {
