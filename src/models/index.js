@@ -42,7 +42,8 @@ class Database {
     this.models.ProductoTallaColor = require('./productoTallaColor.js')(sequelize);
     this.models.Deseo=require('./deseos.js')(sequelize);
     this.models.Promocion=require('./promocion.js')(sequelize);
-    this.models.Invocar= require('./invocar.js')
+    this.models.Invocar = require('./invocar.js')(sequelize); 
+
   }
 
   _associateModels() {
