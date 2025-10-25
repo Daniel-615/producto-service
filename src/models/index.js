@@ -42,12 +42,13 @@ class Database {
     this.models.ProductoTallaColor = require('./productoTallaColor.js')(sequelize);
     this.models.Deseo=require('./deseos.js')(sequelize);
     this.models.Promocion=require('./promocion.js')(sequelize);
+    this.models.Invocar= require('./invocar.js')
   }
 
   _associateModels() {
     const {
       Marca, Categoria, Producto, Talla, Color,
-      ProductoColor, ProductoTallaColor, Deseo, Promocion
+      ProductoColor, ProductoTallaColor, Deseo, Promocion,Invocar
     } = this.models;
 
     // Producto ↔ Marca
