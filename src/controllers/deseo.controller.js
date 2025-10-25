@@ -48,7 +48,17 @@ class DeseoController {
       res.status(500).send({ message: "Error al obtener los deseos." });
     }
   }
-
+  async getDeseosByUsuario(req, res) {
+    const { usuarioId } = req.params;
+    if(!usuarioId) {
+      return res.status(400).send({ message: "El usuarioId es obligatorio." });
+    }
+    const deseos = await deseoService.findByUsuario(usuarioId, req.query);
+    if(!deseos){
+      return res.status(404).send({ message: "No se encontraron deseos para el usuario." });
+    }
+    return res.status(200).send({ success: true, data: deseos || [] });
+  }
   async getDeseoById(req, res) {
     const { id } = req.params;
 

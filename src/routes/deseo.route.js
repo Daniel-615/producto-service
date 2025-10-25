@@ -15,12 +15,17 @@ class DeseoRoute {
       (req, res) => this.controller.createDeseo(req, res)
     );
 
- 
+    this.router.get('/usuarios/:usuarioId/deseos',
+      (req, res) => this.controller.getDeseosByUsuario(req, res)
+    );
+
     this.router.get(
       '/deseos',
       (req, res) => this.controller.getDeseos(req, res)
     );
-
+    this.router.get('/deseos/:id',
+      (req, res) => this.controller.getDeseoById(req, res)
+    );
 
     this.router.patch(
       '/deseos/:id/consumir',
