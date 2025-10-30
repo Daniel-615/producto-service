@@ -84,7 +84,7 @@ class ColorController {
     }
   }
 
-  async deleteCategoria(req, res) {
+  async deleteColor(req, res) {
     const { id } = req.params;
 
     try {
